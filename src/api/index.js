@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.timeout = 1000000; // 重新请求时间
+axios.defaults.timeout = 1000000; // 重新请求时间 1111
 axios.defaults.headers.Accept = "application/json";
 
 const UPLOAD_URL = "http://doyoudo.club:8090";
