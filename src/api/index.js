@@ -5,7 +5,7 @@ axios.defaults.headers.Accept = "application/json";
 const UPLOAD_URL = "http://doyoudo.club:8090";
 // const POST_URL = "http://doyoudo.club:8090";
 const POST_URL = "http://34297c86t9.wicp.vip:8090";
-//加个注释
+//加个注释 ssss
 
 // 添加请求拦截器
 axios.interceptors.request.use(
