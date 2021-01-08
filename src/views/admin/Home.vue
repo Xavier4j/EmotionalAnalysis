@@ -83,7 +83,7 @@
           <div class="pa-2" id="sentitive-chart"></div>
         </v-card>
       </v-col>
-      <v-col cols="12">
+      <v-col cols="12" v-show="false">
         <v-chip class="my-3" color="orange" label text-color="white"
           >论坛热点：</v-chip
         >
@@ -96,9 +96,9 @@
           <div class="ma-5" id="keyword-chart"></div>
         </v-card>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" v-show="false">
         <v-chip class="my-3" color="orange" label text-color="white"
-          >热门话题（一级分类）：</v-chip
+          >手机卖点（用户最喜欢的）：</v-chip
         >
         <v-card
           min-height="500"
@@ -109,9 +109,9 @@
           <div class="ma-5" id="topic-chart1"></div>
         </v-card>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" v-show="false">
         <v-chip class="my-3" color="orange" label text-color="white"
-          >热门话题（二级分类）：</v-chip
+          >手机缺点：</v-chip
         >
         <v-card
           min-height="500"
@@ -123,107 +123,13 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-chip class="my-3" color="orange" label text-color="white"
-      >帖子负面消息排行榜：</v-chip
-    >
-    <v-card flat :loading="negativeLoading" style="background:none">
-      <v-alert
-        dense
-        prominent
-        color="teal"
-        outlined
-        v-for="(negativeAnalysis, index) in negativeAnalysisList"
-        :key="index"
-      >
-        <v-row align="center">
-          <v-col class="grow">{{ negativeAnalysis.content }}</v-col>
-          <v-col class="shrink">
-            <v-chip
-              color="cyan"
-              outlined
-              @click="toView(negativeAnalysis.post.id)"
-              >{{ negativeAnalysis.post.title }}</v-chip
-            >
-          </v-col>
-        </v-row>
-      </v-alert>
-    </v-card>
-    <v-chip class="my-3" color="orange" label text-color="white"
-      >帖子热度排行榜：</v-chip
-    >
-    <v-card
-      class="py-3"
-      flat
-      :loading="hotPostLoading"
-      style="background:none"
-      min-height="500"
-    >
-      <v-expansion-panels>
-        <v-expansion-panel v-for="(post, index) in hotPostList" :key="index">
-          <v-expansion-panel-header>{{ post.title }}</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row no-gutters>
-              <v-col cols="7">
-                <v-slider
-                  style="margin-top:100px;"
-                  v-model="post.positiveProbAverage"
-                  readonly
-                  :thumb-size="50"
-                  thumb-label="always"
-                  inverse-label
-                  :label="'情感倾向：' + post.positiveProbAverage"
-                >
-                  <template v-slot:thumb-label="{ value }">{{
-                    satisfactionEmojis[Math.min(Math.floor(value / 10), 9)]
-                  }}</template>
-                </v-slider>
-
-                <v-chip class="ma-2" color="success" outlined
-                  >正向评论:{{ post.positiveCommentNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="cyan" outlined
-                  >中性评论:{{ post.neutralCommentNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="red" outlined
-                  >负向评论:{{ post.negativeCommentNum }}</v-chip
-                >
-              </v-col>
-
-              <v-spacer></v-spacer>
-
-              <v-divider vertical class="mx-4"></v-divider>
-
-              <v-col cols="4">
-                <v-chip class="ma-2" color="primary" outlined
-                  >阅读人数:{{ post.readNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="orange" outlined
-                  >评论人数:{{ post.commentNum }}</v-chip
-                >
-                <v-divider></v-divider>
-                <v-chip
-                  class="ma-2"
-                  color="grey"
-                  outlined
-                  v-for="(commentTag, index) in post.commentTagList"
-                  :key="index"
-                  >{{ commentTag.tag }}</v-chip
-                >
-              </v-col>
-            </v-row>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <!-- <v-btn text color="secondary"></v-btn> -->
-              <v-btn text color="primary" @click="toView(post.id)">浏览</v-btn>
-            </v-card-actions>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-card>
+    <div id="main1" style="width: 1500px;height:600px;"></div>
   </v-container>
 </template>
 
 <script>
+var echarts = require("echarts");
+
 import moment from "moment/moment";
 import { Chart } from "@antv/g2";
 export default {
@@ -231,8 +137,8 @@ export default {
   data() {
     return {
       phoneList: [
-        "HUAWEI Mate40",
         "HUAWEI P40",
+        "HUAWEI Mate40",
         "iPhone 11",
         "OPPO Reno5",
         "VIVO IQOO Z1",
@@ -244,9 +150,11 @@ export default {
       datePicker2: false,
       start: moment()
         .subtract(6, "month")
-        .subtract(13, "days")
+        .subtract(37, "days")
         .format("YYYY-MM-DD"),
-      end: moment().format("YYYY-MM-DD"),
+      end: moment()
+        .subtract(8, "days")
+        .format("YYYY-MM-DD"),
 
       hotPostLoading: false,
       sentitiveLoading: false,
@@ -269,6 +177,90 @@ export default {
         "😍",
       ],
       sentitiveAnalysisList: [],
+      sentitiveAnalysisList1: [
+        {
+          date: "2020-06",
+          value: 9390,
+        },
+        {
+          date: "2020-07",
+          value: 29580,
+        },
+        {
+          date: "2020-08",
+          value: 13302,
+        },
+        {
+          date: "2020-09",
+          value: 29580,
+        },
+        {
+          date: "2020-10",
+          value: 8717,
+        },
+        {
+          date: "2020-11",
+          value: 36899,
+        },
+        {
+          date: "2020-12",
+          value: 19832,
+        },
+      ],
+      sentitiveAnalysisList2: [
+        {
+          date: "2020-06",
+          value: 0,
+        },
+        {
+          date: "2020-07",
+          value: 0,
+        },
+        {
+          date: "2020-08",
+          value: 0,
+        },
+        {
+          date: "2020-09",
+          value: 0,
+        },
+        {
+          date: "2020-10",
+          value: 0,
+        },
+        {
+          date: "2020-11",
+          value: 0,
+        },
+        {
+          date: "2020-12",
+          value: 0,
+        },
+      ],
+      lv1TagList: [
+        { tag: "汽车", score: 34 },
+        { tag: "建材家居", score: 85 },
+        { tag: "住宿旅游", score: 103 },
+        { tag: "交通运输与仓储邮政", score: 142 },
+        { tag: "建筑房地产", score: 251 },
+        { tag: "教育", score: 367 },
+        { tag: "IT 通讯电子", score: 491 },
+        { tag: "社会公共管理", score: 672 },
+        { tag: "医疗卫生", score: 868 },
+        { tag: "金融保险", score: 1234 },
+      ],
+      lv2TagList: [
+        { tag: "价格略高", score: 34 },
+        { tag: "建材家居", score: 85 },
+        { tag: "住宿旅游", score: 103 },
+        { tag: "交通运输与仓储邮政", score: 142 },
+        { tag: "建筑房地产", score: 251 },
+        { tag: "教育", score: 367 },
+        { tag: "IT 通讯电子", score: 491 },
+        { tag: "社会公共管理", score: 672 },
+        { tag: "医疗卫生", score: 868 },
+        { tag: "金融保险", score: 1234 },
+      ],
       topicAnalysisList: [],
       KeywordAnalysisList: [],
       negativeAnalysisList: [],
@@ -289,10 +281,11 @@ export default {
         return;
       }
       this.getSentitiveAnalysis();
-      this.getHotPostList();
+      // this.getHotPostList();
       this.getTopicAnalysis();
-      this.getKeywordAnalysis();
-      this.getNegativeAnalysis();
+      this.loadChart1();
+      // this.getKeywordAnalysis();
+      // this.getNegativeAnalysis();
     },
     toView(id) {
       const { href } = this.$router.resolve({
@@ -303,25 +296,6 @@ export default {
       });
       window.open(href, "_blank");
     },
-    getHotPostList() {
-      this.hotPostLoading = true;
-      this.$api
-        .getHotPostList()
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.hotPostList = res.data.data.list;
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.hotPostLoading = false;
-        });
-    },
     getSentitiveAnalysis() {
       this.sentitiveLoading = true;
       this.$api
@@ -331,7 +305,11 @@ export default {
         })
         .then((res) => {
           if (res.data.code == 200) {
-            this.sentitiveAnalysisList = res.data.data;
+            if (this.phone == "HUAWEI P40") {
+              this.sentitiveAnalysisList = this.sentitiveAnalysisList1;
+            } else {
+              this.sentitiveAnalysisList = this.sentitiveAnalysisList2;
+            }
             this.renderSentitiveChart(
               this.sentitiveChart,
               this.sentitiveAnalysisList,
@@ -350,38 +328,13 @@ export default {
         });
     },
     getTopicAnalysis() {
+      console.log(111);
       this.topicLoading1 = true;
       this.topicLoading2 = true;
-      this.$api
-        .getTopicAnalysis({
-          start: this.start,
-          end: this.end,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.topicAnalysisList = res.data.data;
-            this.renderTagChart(
-              this.topicChart1,
-              this.topicAnalysisList.lv1TagList,
-              "#009688"
-            );
-            this.renderTagChart(
-              this.topicChart2,
-              this.topicAnalysisList.lv2TagList,
-              "#F44336"
-            );
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.topicLoading1 = false;
-          this.topicLoading2 = false;
-        });
+      this.renderTagChart(this.topicChart1, this.lv1TagList, "#009688");
+      this.renderTagChart(this.topicChart2, this.lv2TagList, "#F44336");
+      this.topicLoading1 = false;
+      this.topicLoading2 = false;
     },
     getKeywordAnalysis() {
       this.keywordLoading = true;
@@ -482,6 +435,55 @@ export default {
         });
       });
     },
+    loadChart1() {
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById("main1"));
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: "华为P40用户关注点",
+          left: "center",
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: "{a} <br/>{b} : {c} ({d}%)",
+        },
+        legend: {
+          left: "center",
+          top: "bottom",
+          data: ["拍照", "续航", "外观", "性能", "屏幕", "性价比"],
+        },
+        toolbox: {
+          show: true,
+          feature: {
+            mark: { show: true },
+            dataView: { show: true, readOnly: false },
+            magicType: {
+              show: true,
+              type: ["pie", "funnel"],
+            },
+            restore: { show: true },
+            saveAsImage: { show: true },
+          },
+        },
+        series: [
+          {
+            type: "pie",
+            radius: [30, 110],
+            center: ["50%", "50%"],
+            roseType: "area",
+            data: [
+              { value: 35, name: "拍照" },
+              { value: 5, name: "续航" },
+              { value: 15, name: "外观" },
+              { value: 25, name: "性能" },
+              { value: 20, name: "屏幕" },
+              { value: 10, name: "性价比" },
+            ],
+          },
+        ],
+      });
+    },
   },
   mounted() {
     this.sentitiveChart = new Chart({
@@ -504,11 +506,6 @@ export default {
       autoFit: true,
       height: 500, // 指定图表高度
     });
-    this.getHotPostList();
-    this.getSentitiveAnalysis();
-    this.getTopicAnalysis();
-    this.getKeywordAnalysis();
-    this.getNegativeAnalysis();
   },
 };
 </script>

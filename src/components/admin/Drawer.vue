@@ -37,7 +37,7 @@ export default {
     dialog: false,
     items: [
       { icon: "mdi-history", title: "基础分析", path: "/admin/home" },
-      { icon: "mdi-history", title: "总体分析", path: "/admin/plate" },
+      { icon: "mdi-history", title: "总体分析", path: "/admin/total" },
     ],
   }),
   computed: {

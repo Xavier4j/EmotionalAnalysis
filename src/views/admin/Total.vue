@@ -1,231 +1,16 @@
 <template>
   <v-container>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="5">
-        <v-select
-          v-model="phone"
-          solo
-          :items="phoneList"
-          item-text="title"
-          item-value="value"
-          label="型号选择"
-        ></v-select>
-      </v-col>
-    </v-row>
-
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="5">
-        <v-menu
-          v-model="datePicker1"
-          :close-on-content-click="false"
-          :nudge-right="40"
-          transition="scale-transition"
-          offset-y
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="start"
-              label="Start"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="start"
-            @input="datePicker1 = false"
-          ></v-date-picker>
-        </v-menu>
-      </v-col>
-
-      <v-col cols="12" md="5">
-        <v-menu
-          v-model="datePicker2"
-          :close-on-content-click="false"
-          :nudge-right="40"
-          transition="scale-transition"
-          offset-y
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="end"
-              label="End"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="end"
-            @input="datePicker2 = false"
-          ></v-date-picker>
-        </v-menu>
-      </v-col>
-
-      <v-col cols="12" md="2">
-        <v-btn color="success" class="mb-3" @click="analysis">分析</v-btn>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <v-chip class="my-3" color="orange" label text-color="white"
-          >手机销量：</v-chip
-        >
-        <v-card
-          min-height="500"
-          flat
-          :loading="sentitiveLoading"
-          style="background:none"
-        >
-          <div class="pa-2" id="sentitive-chart"></div>
-        </v-card>
-      </v-col>
-      <v-col cols="12">
-        <v-chip class="my-3" color="orange" label text-color="white"
-          >论坛热点：</v-chip
-        >
-        <v-card
-          min-height="500"
-          flat
-          :loading="keywordLoading"
-          style="background:none"
-        >
-          <div class="ma-5" id="keyword-chart"></div>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-chip class="my-3" color="orange" label text-color="white"
-          >热门话题（一级分类）：</v-chip
-        >
-        <v-card
-          min-height="500"
-          flat
-          :loading="topicLoading1"
-          style="background:none"
-        >
-          <div class="ma-5" id="topic-chart1"></div>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-chip class="my-3" color="orange" label text-color="white"
-          >热门话题（二级分类）：</v-chip
-        >
-        <v-card
-          min-height="500"
-          flat
-          :loading="topicLoading2"
-          style="background:none"
-        >
-          <div class="ma-5" id="topic-chart2"></div>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-chip class="my-3" color="orange" label text-color="white"
-      >帖子负面消息排行榜：</v-chip
-    >
-    <v-card flat :loading="negativeLoading" style="background:none">
-      <v-alert
-        dense
-        prominent
-        color="teal"
-        outlined
-        v-for="(negativeAnalysis, index) in negativeAnalysisList"
-        :key="index"
-      >
-        <v-row align="center">
-          <v-col class="grow">{{ negativeAnalysis.content }}</v-col>
-          <v-col class="shrink">
-            <v-chip
-              color="cyan"
-              outlined
-              @click="toView(negativeAnalysis.post.id)"
-              >{{ negativeAnalysis.post.title }}</v-chip
-            >
-          </v-col>
-        </v-row>
-      </v-alert>
-    </v-card>
-    <v-chip class="my-3" color="orange" label text-color="white"
-      >帖子热度排行榜：</v-chip
-    >
-    <v-card
-      class="py-3"
-      flat
-      :loading="hotPostLoading"
-      style="background:none"
-      min-height="500"
-    >
-      <v-expansion-panels>
-        <v-expansion-panel v-for="(post, index) in hotPostList" :key="index">
-          <v-expansion-panel-header>{{ post.title }}</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row no-gutters>
-              <v-col cols="7">
-                <v-slider
-                  style="margin-top:100px;"
-                  v-model="post.positiveProbAverage"
-                  readonly
-                  :thumb-size="50"
-                  thumb-label="always"
-                  inverse-label
-                  :label="'情感倾向：' + post.positiveProbAverage"
-                >
-                  <template v-slot:thumb-label="{ value }">{{
-                    satisfactionEmojis[Math.min(Math.floor(value / 10), 9)]
-                  }}</template>
-                </v-slider>
-
-                <v-chip class="ma-2" color="success" outlined
-                  >正向评论:{{ post.positiveCommentNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="cyan" outlined
-                  >中性评论:{{ post.neutralCommentNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="red" outlined
-                  >负向评论:{{ post.negativeCommentNum }}</v-chip
-                >
-              </v-col>
-
-              <v-spacer></v-spacer>
-
-              <v-divider vertical class="mx-4"></v-divider>
-
-              <v-col cols="4">
-                <v-chip class="ma-2" color="primary" outlined
-                  >阅读人数:{{ post.readNum }}</v-chip
-                >
-                <v-chip class="ma-2" color="orange" outlined
-                  >评论人数:{{ post.commentNum }}</v-chip
-                >
-                <v-divider></v-divider>
-                <v-chip
-                  class="ma-2"
-                  color="grey"
-                  outlined
-                  v-for="(commentTag, index) in post.commentTagList"
-                  :key="index"
-                  >{{ commentTag.tag }}</v-chip
-                >
-              </v-col>
-            </v-row>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <!-- <v-btn text color="secondary"></v-btn> -->
-              <v-btn text color="primary" @click="toView(post.id)">浏览</v-btn>
-            </v-card-actions>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-card>
+    <div id="main1" style="width: 1200px;height:400px;"></div>
+    <div id="main2" style="width: 1200px;height:400px;"></div>
+    <div id="main3" style="width: 1200px;height:400px;"></div>
+    <div id="main4" style="width: 1200px;height:400px;"></div>
   </v-container>
 </template>
 
 <script>
+var echarts = require("echarts");
+
 import moment from "moment/moment";
-import { Chart } from "@antv/g2";
 export default {
   name: "Total",
   data() {
@@ -243,6 +28,7 @@ export default {
       datePicker1: false,
       datePicker2: false,
       start: moment()
+        .subtract(6, "month")
         .subtract(13, "days")
         .format("YYYY-MM-DD"),
       end: moment().format("YYYY-MM-DD"),
@@ -274,228 +60,191 @@ export default {
     };
   },
   methods: {
-    analysis() {
-      this.getSentitiveAnalysis();
-      this.getHotPostList();
-      this.getTopicAnalysis();
-      this.getKeywordAnalysis();
-      this.getNegativeAnalysis();
-    },
-    toView(id) {
-      const { href } = this.$router.resolve({
-        path: `/post`,
-        query: {
-          id: id,
+    loadChart1() {
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById("main1"));
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: "手机满意度",
         },
-      });
-      window.open(href, "_blank");
-    },
-    getHotPostList() {
-      this.hotPostLoading = true;
-      this.$api
-        .getHotPostList()
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.hotPostList = res.data.data.list;
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.hotPostLoading = false;
-        });
-    },
-    getSentitiveAnalysis() {
-      this.sentitiveLoading = true;
-      this.$api
-        .getSentitiveAnalysis({
-          start: this.start,
-          end: this.end,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.sentitiveAnalysisList = res.data.data;
-            this.renderSentitiveChart(
-              this.sentitiveChart,
-              this.sentitiveAnalysisList,
-              "#f0657d"
-            );
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.sentitiveLoading = false;
-        });
-    },
-    getTopicAnalysis() {
-      this.topicLoading1 = true;
-      this.topicLoading2 = true;
-      this.$api
-        .getTopicAnalysis({
-          start: this.start,
-          end: this.end,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.topicAnalysisList = res.data.data;
-            this.renderTagChart(
-              this.topicChart1,
-              this.topicAnalysisList.lv1TagList,
-              "#009688"
-            );
-            this.renderTagChart(
-              this.topicChart2,
-              this.topicAnalysisList.lv2TagList,
-              "#F44336"
-            );
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.topicLoading1 = false;
-          this.topicLoading2 = false;
-        });
-    },
-    getKeywordAnalysis() {
-      this.keywordLoading = true;
-      this.$api
-        .getKeywordAnalysis({
-          start: this.start,
-          end: this.end,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.KeywordAnalysisList = res.data.data;
-            this.renderTagChart(
-              this.keywordChart,
-              this.KeywordAnalysisList,
-              "#E91E63"
-            );
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.keywordLoading = false;
-        });
-    },
-    getNegativeAnalysis() {
-      this.negativeLoading = true;
-      this.$api
-        .getNegativeAnalysis({
-          start: this.start,
-          end: this.end,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.negativeAnalysisList = res.data.data.list;
-          } else {
-            console.log("获取数据失败！");
-          }
-        })
-        .catch((err) => {
-          console.log("获取数据失败！");
-          console.log(err);
-        })
-        .finally(() => {
-          this.negativeLoading = false;
-        });
-    },
-    renderSentitiveChart(chart, data, color) {
-      chart.data(data);
-      chart.scale({
-        date: {
-          range: [0, 1],
+        xAxis: {
+          type: "category",
+          data: [
+            "小米10",
+            "iphone11",
+            "华为P40",
+            "华为Mate40",
+            "OppoReno4",
+            "VivoNex3",
+          ],
+          name: "手机品牌",
         },
-        value: {
-          min: 0,
-          nice: true,
-        },
-      });
-      chart.tooltip({
-        showMarkers: false,
-      });
-      chart.tooltip({
-        showCrosshairs: true, // 展示 Tooltip 辅助线
-        shared: true,
-      });
-      chart
-        .line()
-        .position("date*value")
-        .label("value")
-        .color(color);
-      chart.point().position("date*value");
-
-      chart.render();
-    },
-    renderTagChart(chart, data, color) {
-      chart.data(data);
-      chart.scale("score", { nice: true });
-      chart.coordinate().transpose();
-      chart.tooltip({
-        showMarkers: false,
-      });
-      chart.interaction("active-region");
-      chart
-        .interval()
-        .position("tag*score")
-        .color(color);
-      chart.render();
-
-      chart.on("element:click", (ev) => {
-        this.$router.push({
-          path: "post",
-          query: {
-            keyword: ev.data.data.tag,
+        yAxis: {
+          type: "value",
+          min: 80,
+          max: 100,
+          axisLabel: {
+            formatter: "{value} %",
           },
-        });
+          name: "满意度",
+        },
+
+        series: [
+          {
+            data: [92, 95.6, 95, 97, 96, 94],
+            type: "bar",
+            showBackground: true,
+            backgroundStyle: {
+              color: "rgba(220, 220, 220, 0.8)",
+            },
+          },
+        ],
+      });
+    },
+    loadChart2() {
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById("main2"));
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: "价格-满意度关系",
+        },
+        xAxis: {
+          type: "category",
+          name: "价格",
+        },
+        yAxis: {
+          type: "value",
+          min: 80,
+          max: 100,
+          axisLabel: {
+            formatter: "{value} %",
+          },
+          name: "满意度",
+        },
+        series: [
+          {
+            data: [92, 94, 95, 97, 96, 95.6],
+            type: "line",
+          },
+        ],
+      });
+    },
+    loadChart3() {
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById("main3"));
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: "不同手机用户痛点图",
+        },
+        legend: {
+          data: ["小米10", "iphone11", "华为p40", "vivoNex3", "oppoReno3"],
+        },
+        radar: [
+          {
+            indicator: [
+              { text: "拍照" },
+              { text: "性价比" },
+              { text: "性能" },
+              { text: "续航" },
+              { text: "屏幕" },
+              { text: "外观" },
+            ],
+            center: ["50%", "50%"],
+            radius: 120,
+            startAngle: 90,
+            splitNumber: 4,
+            shape: "circle",
+            name: {
+              formatter: "【{value}】",
+              textStyle: {
+                color: "#72ACD1",
+              },
+            },
+            splitArea: {
+              areaStyle: {
+                color: [
+                  "rgba(114, 172, 209, 0.2)",
+                  "rgba(114, 172, 209, 0.4)",
+                  "rgba(114, 172, 209, 0.6)",
+                  "rgba(114, 172, 209, 0.8)",
+                  "rgba(114, 172, 209, 1)",
+                ],
+                shadowColor: "rgba(0, 0, 0, 0.3)",
+                shadowBlur: 10,
+              },
+            },
+            axisLine: {
+              lineStyle: {
+                color: "rgba(255, 255, 255, 0.5)",
+              },
+            },
+            splitLine: {
+              lineStyle: {
+                color: "rgba(255, 255, 255, 0.5)",
+              },
+            },
+          },
+        ],
+        series: [
+          {
+            name: "雷达图",
+            type: "radar",
+            emphasis: {
+              lineStyle: {
+                width: 4,
+              },
+            },
+            data: [
+              {
+                value: [80, 85, 75, 90, 90, 85],
+                name: "小米10",
+                symbol: "rect",
+                symbolSize: 5,
+                lineStyle: {
+                  type: "dashed",
+                },
+              },
+              {
+                value: [75, 70, 90, 90, 87, 76],
+                name: "iphone11",
+                areaStyle: {
+                  color: "rgba(255, 255, 255, 0.5)",
+                },
+              },
+              {
+                value: [90, 75, 83, 85, 80, 87],
+                name: "华为p40",
+                areaStyle: {
+                  color: "rgba(255, 255, 255, 0.5)",
+                },
+              },
+              {
+                value: [85, 75, 80, 90, 75, 86],
+                name: "vivoNex3",
+                areaStyle: {
+                  color: "rgba(255, 255, 255, 0.5)",
+                },
+              },
+              {
+                value: [80, 85, 90, 80, 86, 75],
+                name: "oppoReno3",
+                areaStyle: {
+                  color: "rgba(255, 255, 255, 0.5)",
+                },
+              },
+            ],
+          },
+        ],
       });
     },
   },
   mounted() {
-    this.sentitiveChart = new Chart({
-      container: "sentitive-chart",
-      autoFit: true,
-      height: 500,
-    });
-    this.topicChart1 = new Chart({
-      container: "topic-chart1",
-      autoFit: true,
-      height: 500,
-    });
-    this.topicChart2 = new Chart({
-      container: "topic-chart2",
-      autoFit: true,
-      height: 500,
-    });
-    this.keywordChart = new Chart({
-      container: "keyword-chart", // 指定图表容器 ID
-      autoFit: true,
-      height: 500, // 指定图表高度
-    });
-    this.getHotPostList();
-    this.getSentitiveAnalysis();
-    this.getTopicAnalysis();
-    this.getKeywordAnalysis();
-    this.getNegativeAnalysis();
+    this.loadChart1();
+    this.loadChart2();
+    this.loadChart3();
   },
 };
 </script>

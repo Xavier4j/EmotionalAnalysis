@@ -34,9 +34,9 @@ export default new Router({
           component: () => import("@/views/admin/PostList"),
         },
         {
-          name: "Plate Manage",
-          path: "plate",
-          component: () => import("@/views/admin/PlateManage"),
+          name: "Total Manage",
+          path: "total",
+          component: () => import("@/views/admin/Total"),
         },
         {
           name: "Moderator Manage",

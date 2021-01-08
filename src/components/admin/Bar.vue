@@ -110,12 +110,12 @@ export default {
     },
   },
   created() {
-    this.getMessageCount();
-    this.id_of_setinterval = setInterval(this.getMessageCount, 1000 * 60);
+    // this.getMessageCount();
+    // this.id_of_setinterval = setInterval(this.getMessageCount, 1000 * 60);
   },
   beforeDestroy() {
-    console.log("destory");
-    clearInterval(this.id_of_setinterval);
+    // console.log("destory");
+    // clearInterval(this.id_of_setinterval);
   },
 };
 </script>
