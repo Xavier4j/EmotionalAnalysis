@@ -1,144 +1,29 @@
 <template>
   <v-container>
-    <v-card flat :loading="messageLoading" min-height="500" style="background:none">
-      <v-alert outlined color="cyan" v-if="total===0" border="left">你没有任何消息！</v-alert>
-      <v-row class="ma-2">
-        <v-col cols="12" v-for="(message,index) in messageList" :key="index">
-          <v-alert
-            outlined
-            prominent
-            icon="mdi-message-text"
-            :color="message.status==1?'grey lighten-1':'primary'"
-            v-if="message.type==1"
-          >
-            <v-row align="center">
-              <v-col class="grow">
-                <strong>评论消息：</strong>用户
-                <strong>{{message.senderProfile.nickname}}</strong>
-                在帖子
-                <v-chip
-                  color="primary"
-                  outlined
-                  @click="toPostView(message.postId)"
-                >{{message.postTitle}}</v-chip>
-                下评论了你：
-                {{message.content}}
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                  text
-                  color="blue-grey"
-                  :disabled="message.status==1"
-                  @click="readMessage(message.id)"
-                >{{message.status==1?"已读":"标记为已读"}}</v-btn>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn text class="error--text" @click="deleteMessage(message.id)">删除</v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-          <v-alert
-            outlined
-            prominent
-            icon="mdi-message-minus"
-            :color="message.status==1?'grey lighten-1':'cyan'"
-            v-else-if="message.type==2"
-          >
-            <v-row align="center">
-              <v-col class="grow">
-                <strong>回复消息：</strong>用户
-                <strong>{{message.senderProfile.nickname}}</strong>
-                在帖子
-                <v-chip
-                  color="cyan"
-                  outlined
-                  @click="toPostView(message.postId)"
-                >{{message.postTitle}}</v-chip>
-                下回复了你：
-                {{message.content}}
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                  text
-                  color="blue-grey"
-                  :disabled="message.status==1"
-                  @click="readMessage(message.id)"
-                >{{message.status==1?"已读":"标记为已读"}}</v-btn>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn text class="error--text" @click="deleteMessage(message.id)">删除</v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-          <v-alert
-            outlined
-            prominent
-            icon="mdi-message-cog"
-            :color="message.status==1?'grey lighten-1':'error'"
-            v-else
-          >
-            <v-row align="center">
-              <v-col class="grow">
-                <strong>系统消息：</strong>
-                {{message.content}}
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                  text
-                  color="blue-grey"
-                  :disabled="message.status==1"
-                  @click="readMessage(message.id)"
-                >{{message.status==1?"已读":"标记为已读"}}</v-btn>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn text class="error--text" @click="deleteMessage(message.id)">删除</v-btn>
-              </v-col>
-            </v-row>
-          </v-alert>
-        </v-col>
-      </v-row>
-    </v-card>
+    <div id="main1" style="width: 600px;height:400px;"></div>
   </v-container>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+var echarts = require("echarts");
+
 export default {
   name: "Message",
   data() {
     return {
-      messageLoading: false,
-      messageList: [],
-      total: "",
-      pageNum: 1,
-      pageSize: 18
+      data1: ["小米", "华为", "苹果11", "vivo", "oppo", "三星"],
     };
   },
-  computed: {
-    ...mapState(["token"])
-  },
   methods: {
-    ...mapMutations({
-      setDrawer: "SET_DRAWER"
-    }),
-    toPostView(id) {
-      this.$router.push({
-        path: "post",
-        query: {
-          id: id
-        }
-      });
-      this.setDrawer(false);
-    },
     getMessageList() {
       this.messageLoading = true;
       this.$api
         .getMessageList({
           receiver: this.token,
           pageNum: this.pageNum,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.code == 200) {
             this.messageList = res.data.data.list;
             this.total = res.data.data.total;
@@ -146,7 +31,7 @@ export default {
             console.log("获取数据失败！");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           // this.$message.error("获取数据失败！");
           console.log(err);
         })
@@ -154,40 +39,32 @@ export default {
           this.messageLoading = false;
         });
     },
-    readMessage(id) {
-      this.$api
-        .updateMessage({
-          id: id,
-          status: 1
-        })
-        .then(res => {
-          if (res.data.code == 200) {
-            this.getMessageList();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        })
-        .finally(() => {});
+    initEmotional1Charts() {
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(document.getElementById("main1"));
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: "旗舰",
+        },
+        tooltip: {},
+        xAxis: {
+          data: this.data1,
+        },
+        yAxis: {},
+        series: [
+          {
+            name: "销量",
+            type: "bar",
+            data: [5, 20, 36, 10, 10, 20],
+          },
+        ],
+      });
     },
-    deleteMessage(id) {
-      this.$api
-        .deleteMessage({
-          id: id
-        })
-        .then(res => {
-          if (res.data.code == 200) {
-            this.getMessageList();
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        })
-        .finally(() => {});
-    }
   },
   mounted() {
-    this.getMessageList();
-  }
+    //this.getMessageList();
+    this.initEmotional1Charts();
+  },
 };
 </script>
