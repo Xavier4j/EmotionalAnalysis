@@ -14,7 +14,11 @@
       :auto-line-width="autoLineWidth"
       auto-draw
     ></v-sparkline>
-    <v-container fluid fill-height style="opacity: .8;z-index:2;margin-top: -100vh;">
+    <v-container
+      fluid
+      fill-height
+      style="opacity: .8;z-index:2;margin-top: -100vh;"
+    >
       <v-layout align-center justify-center>
         <v-flex xs12 sm8 md4>
           <v-card class="elevation-12">
@@ -27,8 +31,9 @@
                 color="red lighten-5"
                 light
                 outlined
-                @click="isLogin =!isLogin"
-              >{{isLogin?'Signup':'Login'}}</v-btn>
+                @click="isLogin = !isLogin"
+                >{{ isLogin ? "Signup" : "Login" }}</v-btn
+              >
             </v-toolbar>
             <v-card-text>
               <v-form>
@@ -61,19 +66,14 @@
               </v-form>
             </v-card-text>
             <v-card-actions>
-              <v-select
-                v-if="isLogin"
-                class="ml-7 mt-5"
-                style="width:50px"
-                v-model="role"
-                solo
-                :items="roleList"
-                item-text="title"
-                item-value="value"
-                label="角色选择"
-              ></v-select>
               <v-spacer></v-spacer>
-              <v-btn color="cyan" class="text-capitalize" dark @click="submit(logInForm)">Submit</v-btn>
+              <v-btn
+                color="cyan"
+                class="text-capitalize"
+                dark
+                @click="submit(logInForm)"
+                >Submit</v-btn
+              >
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -103,7 +103,7 @@ const gradients = [
   ["red", "orange", "yellow"],
   ["purple", "violet"],
   ["#00c6ff", "#F0F", "#FF0"],
-  ["#f72047", "#ffd200", "#1feaea"]
+  ["#f72047", "#ffd200", "#1feaea"],
 ];
 
 export default {
@@ -129,21 +129,21 @@ export default {
       roleList: [
         {
           title: "普通用户",
-          value: 1
+          value: 1,
         },
         {
           title: "管理员",
-          value: 2
-        }
+          value: 2,
+        },
       ],
       logInForm: {
         username: "",
-        password: ""
+        password: "",
       },
       //注册数据
       signUpForm: {
         username: "",
-        password: ""
+        password: "",
       },
       confirmPassWord: "",
       //消息属性
@@ -155,7 +155,7 @@ export default {
       bottom: "",
       left: "",
       right: "",
-      top: ""
+      top: "",
     };
   },
   methods: {
@@ -179,7 +179,7 @@ export default {
     logIn(logInForm) {
       this.$api
         .logIn(logInForm)
-        .then(res => {
+        .then((res) => {
           console.log(res);
           if (res.data.status) {
             // this.openSnackbar(false,false,false,true,"success","登录成功!",2000);
@@ -193,7 +193,7 @@ export default {
                   text: res.data.msg,
                   timeout: 2000,
                   x: "right",
-                  y: "top"
+                  y: "top",
                 });
                 this.$router.push(this.$route.query.redirect);
               } else {
@@ -206,7 +206,7 @@ export default {
                       text: res.data.msg,
                       timeout: 2000,
                       x: "right",
-                      y: "top"
+                      y: "top",
                     });
                     this.$router.push("/admin/");
                   } else {
@@ -217,7 +217,7 @@ export default {
                       text: "您不是管理员，无法进入管理系统",
                       timeout: 2000,
                       x: "right",
-                      y: "top"
+                      y: "top",
                     });
                   }
                 } else {
@@ -228,9 +228,9 @@ export default {
                     text: res.data.msg,
                     timeout: 2000,
                     x: "right",
-                    y: "top"
+                    y: "top",
                   });
-                  this.$router.push("/");
+                  this.$router.push("/admin");
                 }
               }
             });
@@ -242,12 +242,21 @@ export default {
               text: res.data.msg,
               timeout: 3000,
               x: "right",
-              y: "top"
+              y: "top",
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
+          this.$toast({
+            color: "error",
+            mode: "",
+            snackbar: true,
+            text: "服务器故障，登录失败!",
+            timeout: 3000,
+            x: "right",
+            y: "top",
+          });
         })
         .finally(() => {});
     },
@@ -260,13 +269,13 @@ export default {
           text: "两次输入密码不一样，请检查！",
           timeout: 2000,
           x: "right",
-          y: "top"
+          y: "top",
         });
         return;
       }
       this.$api
         .signUp(logInForm)
-        .then(res => {
+        .then((res) => {
           console.log(res);
           if (res.data.status) {
             this.$toast({
@@ -276,7 +285,7 @@ export default {
               text: res.data.msg,
               timeout: 2000,
               x: "right",
-              y: "top"
+              y: "top",
             });
             // this.$store.commit("", val);
             this.$store.dispatch("LOGIN", res.data.data).then(() => {
@@ -294,11 +303,11 @@ export default {
               text: res.data.msg,
               timeout: 3000,
               x: "right",
-              y: "top"
+              y: "top",
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.$toast({
             color: "error",
             mode: "",
@@ -306,12 +315,12 @@ export default {
             text: "服务器故障了，请稍后重试",
             timeout: 2000,
             x: "right",
-            y: "top"
+            y: "top",
           });
           console.log(err);
         })
         .finally(() => {});
-    }
-  }
+    },
+  },
 };
 </script>

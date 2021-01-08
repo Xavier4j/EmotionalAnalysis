@@ -7,7 +7,10 @@
     dark
   >
     <template v-slot:img="{ props }">
-      <v-img v-bind="props" gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"></v-img>
+      <v-img
+        v-bind="props"
+        gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
+      ></v-img>
     </template>
     <v-btn
       class="ma-2"
@@ -21,22 +24,9 @@
     </v-btn>
     <!-- <v-app-bar-nav-icon tile outlined @click.stop="setDrawer(!drawer)" /> -->
     <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-      <span>doyoudo admin</span>
+      <span>智能手机大数据情感分析</span>
     </v-toolbar-title>
     <v-spacer />
-    <v-btn
-      class="hidden-xs-only"
-      tile
-      outlined
-      color="white"
-      to="write"
-      @click.stop="setDrawer(false)"
-    >
-      <v-icon left>mdi-pencil</v-icon>Write
-    </v-btn>
-    <v-badge class="ma-3" :content="messages" :value="messages" color="green" overlap>
-      <v-icon size="30px" @click="goTo('message')" @click.stop="setDrawer(false)">mdi-email</v-icon>
-    </v-badge>
     <v-btn class="ma-3" text v-if="!token" to="/login">登录/注册</v-btn>
     <v-menu v-else offset-y transition="slide-y-transition" bottom>
       <template v-slot:activator="{ on }">
@@ -47,7 +37,11 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item v-for="(item, index) in items" :key="index" @click="goTo(item.to)">
+        <v-list-item
+          v-for="(item, index) in items"
+          :key="index"
+          @click="goTo(item.to)"
+        >
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
       </v-list>
@@ -65,24 +59,24 @@ export default {
     items: [
       { title: "个人中心", to: "profile" },
       { title: "账号设置", to: "account" },
-      { title: "退出登录", to: "logout" }
+      { title: "退出登录", to: "logout" },
     ],
     messages: 0,
-    id_of_setinterval: ""
+    id_of_setinterval: "",
   }),
 
   computed: {
-    ...mapState(["drawer", "token", "avatar"])
+    ...mapState(["drawer", "token", "avatar"]),
   },
   methods: {
     ...mapMutations({
-      setDrawer: "SET_DRAWER"
+      setDrawer: "SET_DRAWER",
     }),
     goTo(to) {
       if (to == "logout") {
         this.$store.dispatch("LOGOUT");
         this.$router.push({
-          path: "/login"
+          path: "/login",
         });
       } else {
         if (to == "message") {
@@ -90,7 +84,7 @@ export default {
         }
         this.setDrawer(false);
         this.$router.push({
-          path: to
+          path: to,
         });
       }
     },
@@ -98,22 +92,22 @@ export default {
       if (this.token) {
         this.$api
           .getMessageCount({
-            receiver: this.token
+            receiver: this.token,
           })
-          .then(res => {
+          .then((res) => {
             if (res.data.code == 200) {
               this.messages = res.data.data;
             } else {
               console.log("获取数据失败！");
             }
           })
-          .catch(err => {
+          .catch((err) => {
             // this.$message.error("获取数据失败！");
             console.log(err);
           })
           .finally(() => {});
       }
-    }
+    },
   },
   created() {
     this.getMessageCount();
@@ -122,6 +116,6 @@ export default {
   beforeDestroy() {
     console.log("destory");
     clearInterval(this.id_of_setinterval);
-  }
+  },
 };
 </script>

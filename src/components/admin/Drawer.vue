@@ -31,17 +31,14 @@ import { mapState } from "vuex";
 export default {
   name: "Drawer",
   props: {
-    source: String
+    source: String,
   },
   data: () => ({
     dialog: false,
     items: [
-      { icon: "mdi-history", title: "舆情分析", path: "/admin/home" },
-      { icon: "mdi-history", title: "板块管理", path: "/admin/plate" },
-      { icon: "mdi-contacts", title: "版主管理", path: "/admin/moderator" },
-      { icon: "mdi-contacts", title: "用户管理", path: "/admin/user" },
-      { icon: "mdi-contacts", title: "敏感词过滤", path: "/admin/sensitive" }
-    ]
+      { icon: "mdi-history", title: "基础分析", path: "/admin/home" },
+      { icon: "mdi-history", title: "总体分析", path: "/admin/plate" },
+    ],
   }),
   computed: {
     ...mapState(["barColor", "barImage"]),
@@ -51,17 +48,16 @@ export default {
       },
       set(val) {
         this.$store.commit("SET_DRAWER", val);
-      }
+      },
     },
     profile() {
       return {
         avatar: true,
-        title: this.$t("avatar")
+        title: this.$t("avatar"),
       };
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

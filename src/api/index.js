@@ -1,11 +1,10 @@
 import axios from "axios";
-axios.defaults.timeout = 1000000; // 重新请求时间 1111
+axios.defaults.timeout = 10000; // 重新请求时间
 axios.defaults.headers.Accept = "application/json";
 
 const UPLOAD_URL = "http://doyoudo.club:8090";
 // const POST_URL = "http://doyoudo.club:8090";
-const POST_URL = "http://34297c86t9.wicp.vip:8090";
-//加个注释 ssss
+const POST_URL = "http://34297c86t9.wicp.vip:13301";
 
 // 添加请求拦截器
 axios.interceptors.request.use(
