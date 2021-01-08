@@ -227,7 +227,7 @@
 import moment from "moment/moment";
 import { Chart } from "@antv/g2";
 export default {
-  name: "Home",
+  name: "Total",
   data() {
     return {
       phoneList: [
@@ -243,7 +243,6 @@ export default {
       datePicker1: false,
       datePicker2: false,
       start: moment()
-        .subtract(6, "month")
         .subtract(13, "days")
         .format("YYYY-MM-DD"),
       end: moment().format("YYYY-MM-DD"),
@@ -276,18 +275,6 @@ export default {
   },
   methods: {
     analysis() {
-      if (!this.phone) {
-        this.$toast({
-          color: "error",
-          mode: "",
-          snackbar: true,
-          text: "请选择手机型号！",
-          timeout: 2000,
-          x: "right",
-          y: "top",
-        });
-        return;
-      }
       this.getSentitiveAnalysis();
       this.getHotPostList();
       this.getTopicAnalysis();
